@@ -60,8 +60,6 @@
     "mocha-compat": "*",
     "module-link-unlink": "*",
     "node-version-use": "*",
-    "os-shim": "*",
-    "resolve": "*",
     "short-hash": "*",
     "ts-dev-stack": "*",
     "ts-swc-loaders": "*",

@@ -1,10 +1,10 @@
 import spawn from 'cross-spawn-cb';
+import { safeRm } from 'fs-remove-compat';
 import getopts from 'getopts-compat';
 import { link, unlink } from 'link-unlink';
 import path from 'path';
 import Queue from 'queue-cb';
 import resolveBin from 'resolve-bin-sync';
-import rimraf2 from 'rimraf2';
 import type { CommandCallback, CommandOptions } from 'tsds-lib';
 import { installPath } from 'tsds-lib';
 import url from 'url';
@@ -17,6 +17,13 @@ const mochaBin = major < 12 ? ['mocha-compat'] : major < 14 ? ['mocha-compat-esm
 
 export default function c8(args: string[], options: CommandOptions, callback: CommandCallback) {
   const cwd: string = (options.cwd as string) || process.cwd();
+  const opts = getopts(args, { alias: { 'dry-run': 'd' }, boolean: ['dry-run'] });
+  const filteredArgs = args.filter((arg) => arg !== '--dry-run' && arg !== '-d');
+
+  if (opts['dry-run']) {
+    console.log('Dry-run: would run coverage tests with c8');
+    return callback();
+  }
 
   link(cwd, installPath(options), (err, restore) => {
     if (err) return callback(err);
@@ -26,16 +33,16 @@ export default function c8(args: string[], options: CommandOptions, callback: Co
       const mocha = resolveBin.apply(null, mochaBin);
       const loader = resolveBin('ts-swc-loaders', 'ts-swc');
 
-      const { _, ...opts } = getopts(args, { stopEarly: true, alias: { config: 'c' } });
+      const { _, ...innerOpts } = getopts(filteredArgs, { stopEarly: true, alias: { config: 'c' } });
       const spawnArgs = [c8];
-      if (!opts.config) Array.prototype.push.apply(spawnArgs, ['--config', config]);
+      if (!innerOpts.config) Array.prototype.push.apply(spawnArgs, ['--config', config]);
       Array.prototype.push.apply(spawnArgs, [mocha, '--watch-extensions', 'ts,tsx']);
-      Array.prototype.push.apply(spawnArgs, args);
+      Array.prototype.push.apply(spawnArgs, filteredArgs);
       if (_.length === 0) Array.prototype.push.apply(spawnArgs, [['test/**/*.test.*']]);
       const dest = path.join(cwd, 'coverage');
 
       const queue = new Queue(1);
-      queue.defer((cb) => rimraf2(dest, { disableGlob: true }, cb.bind(null, null)));
+      queue.defer((cb) => safeRm(dest, cb));
       queue.defer(spawn.bind(null, loader, spawnArgs, options));
       queue.await((err) => unlink(restore, callback.bind(null, err)));
     } catch (err) {

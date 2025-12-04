@@ -43,12 +43,12 @@
     "assert": "1.5.0",
     "c8": "*",
     "cross-spawn-cb": "*",
+    "fs-remove-compat": "*",
     "getopts-compat": "*",
     "link-unlink": "*",
     "queue-cb": "*",
     "regenerator-runtime": "*",
     "resolve-bin-sync": "*",
-    "rimraf2": "*",
     "ts-swc-loaders": "*",
     "tsds-lib": "*",
     "tsds-mocha": "*"

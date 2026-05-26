@@ -27,6 +27,7 @@ export default function c8(args: string[], options: CommandOptions, callback: Co
 
   link(cwd, installPath(options), (err, restore) => {
     if (err) return callback(err);
+    if (!restore) return callback(new Error('link did not return restore path'));
 
     try {
       const c8 = resolveBin('c8');
@@ -42,9 +43,9 @@ export default function c8(args: string[], options: CommandOptions, callback: Co
       const dest = path.join(cwd, 'coverage');
 
       const queue = new Queue(1);
-      queue.defer((cb) => safeRm(dest, (err) => cb(err ?? undefined)));
+      queue.defer((cb) => safeRm(dest, (err) => cb(err)));
       queue.defer(spawn.bind(null, loader, spawnArgs, options));
-      queue.await((err) => unlink(restore!, callback.bind(null, err)));
+      queue.await((err) => unlink(restore, callback.bind(null, err)));
     } catch (err) {
       console.log((err as Error).message);
       return callback(err instanceof Error ? err : new Error(String(err)));

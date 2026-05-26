@@ -30,7 +30,7 @@ export default function c8(args: string[], options: CommandOptions, callback: Co
 
     try {
       const c8 = resolveBin('c8');
-      const mocha = resolveBin.apply(null, mochaBin);
+      const mocha = resolveBin(mochaBin[0], mochaBin[1]);
       const loader = resolveBin('ts-swc-loaders', 'ts-swc');
 
       const { _, ...innerOpts } = getopts(filteredArgs, { stopEarly: true, alias: { config: 'c' } });
@@ -42,12 +42,12 @@ export default function c8(args: string[], options: CommandOptions, callback: Co
       const dest = path.join(cwd, 'coverage');
 
       const queue = new Queue(1);
-      queue.defer(safeRm.bind(null, dest));
+      queue.defer((cb) => safeRm(dest, (err) => cb(err ?? undefined)));
       queue.defer(spawn.bind(null, loader, spawnArgs, options));
-      queue.await((err) => unlink(restore, callback.bind(null, err)));
+      queue.await((err) => unlink(restore!, callback.bind(null, err)));
     } catch (err) {
-      console.log(err.message);
-      return callback(err);
+      console.log((err as Error).message);
+      return callback(err instanceof Error ? err : new Error(String(err)));
     }
   });
 }

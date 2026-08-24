@@ -1,6 +1,6 @@
 {
   "name": "tsds-c8",
-  "version": "1.21.3",
+  "version": "1.21.4",
   "description": "Development stack for TypeScript libraries",
   "keywords": [
     "dev",
@@ -41,7 +41,7 @@
   },
   "dependencies": {
     "assert": "1.5.0",
-    "c8": "^11.0.0",
+    "c8": "^12.0.0",
     "cross-spawn-cb": "^3.0.0",
     "fs-remove-compat": "^1.0.0",
     "getopts-compat": "^2.2.5",
@@ -64,5 +64,14 @@
   },
   "engines": {
     "node": ">=0.8"
+  },
+  "allowScripts": {
+    "core-js-pure": true,
+    "tsds-mocha": true,
+    "@swc/core": true,
+    "node-filename-to-dist-paths": true,
+    "node-version-use": true,
+    "node-semvers": true,
+    "thread-sleep-compat": true
   }
 }

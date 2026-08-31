@@ -1,1 +1,1 @@
-ignores: ["node-version-use", "ts-dev-stack", "tsds-c8", "assert", "c8", "regenerator-runtime", "tsds-mocha", "resolve-bin-sync", "module-link-unlink", "short-hash", "tsds-lib-test"]
+ignores: ["tsds-c8", "node-version-use", "ts-dev-stack", "assert", "c8", "regenerator-runtime", "tsds-mocha", "resolve-bin-sync", "module-link-unlink", "short-hash", "tsds-lib-test"]

@@ -50,7 +50,7 @@
     "regenerator-runtime": "^0.14.1",
     "resolve-bin-sync": "^1.0.12",
     "tsds-lib": "^1.21.1",
-    "tsds-mocha": "^1.0.2"
+    "tsds-mocha": "^1.23.6"
   },
   "devDependencies": {
     "@types/mocha": "*",

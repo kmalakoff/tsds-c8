@@ -7,13 +7,12 @@ import Queue from 'queue-cb';
 import resolveBin from 'resolve-bin-sync';
 import type { CommandCallback, CommandOptions } from 'tsds-lib';
 import { installPath } from 'tsds-lib';
+import { mochaBin } from 'tsds-mocha';
 import url from 'url';
 
 const __dirname = path.dirname(typeof __filename === 'undefined' ? url.fileURLToPath(import.meta.url) : __filename);
 
-const major = +process.versions.node.split('.')[0];
 const config = path.join(__dirname, '..', '..', '..', 'assets', 'c8rc.json');
-const mochaBin = major < 12 ? ['mocha-compat'] : major < 14 ? ['mocha-compat-esm', 'mocha'] : ['mocha'];
 
 export default function c8(args: string[], options: CommandOptions, callback: CommandCallback) {
   const cwd: string = (options.cwd as string) || process.cwd();
@@ -31,13 +30,14 @@ export default function c8(args: string[], options: CommandOptions, callback: Co
 
     try {
       const c8 = resolveBin('c8');
-      const mocha = resolveBin(mochaBin[0], mochaBin[1]);
+      const mocha = resolveBin(mochaBin, mochaBin);
       const loader = resolveBin('ts-swc-loaders', 'ts-swc');
 
       const { _, ...innerOpts } = getopts(filteredArgs, { stopEarly: true, alias: { config: 'c' } });
       const spawnArgs = [c8];
       if (!innerOpts.config) Array.prototype.push.apply(spawnArgs, ['--config', config]);
-      Array.prototype.push.apply(spawnArgs, [mocha, '--watch-extensions', 'ts,tsx']);
+      // mocha 3.x only knows --watch-extensions; 10 and 12 only know --extension.
+      Array.prototype.push.apply(spawnArgs, mochaBin === 'mocha-compat-3' ? [mocha, '--watch-extensions', 'ts,tsx'] : [mocha, '--extension', 'ts,tsx']);
       Array.prototype.push.apply(spawnArgs, filteredArgs);
       if (_.length === 0) Array.prototype.push.apply(spawnArgs, [['test/**/*.test.*']]);
       const dest = path.join(cwd, 'coverage');
